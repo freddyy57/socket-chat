@@ -28,6 +28,8 @@ io.on('connection', (client) => {
 
         // emitir un evento para saber cuando se reconecta la persona
         client.broadcast.to(usuario.sala).emit('listaPersona', usuarios.getPersonasPorSala(usuario.sala));
+        // enviar mensaje que alguién se conectó
+        client.broadcast.to(usuario.sala).emit('crearMensaje', crearMensaje('Administrador', `${ usuario.nombre } entró al Chat`));
 
 
         callback(usuarios.getPersonasPorSala(usuario.sala));
@@ -35,7 +37,7 @@ io.on('connection', (client) => {
     });
 
 
-    client.on('crearMensaje', (data) => {
+    client.on('crearMensaje', (data, callback) => {
 
         let persona = usuarios.getPersona(client.id);
 
@@ -43,6 +45,9 @@ io.on('connection', (client) => {
         let mensaje = crearMensaje(persona.nombre, data.mensaje);
         // enviar mensaje a todos
         client.broadcast.to(persona.sala).emit('crearMensaje', mensaje);
+
+        callback(mensaje);
+
     });
 
 
